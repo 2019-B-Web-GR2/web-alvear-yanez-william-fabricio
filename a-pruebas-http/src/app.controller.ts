@@ -1,4 +1,4 @@
-import {Controller, Get, HttpCode, InternalServerErrorException, Post} from '@nestjs/common';
+import {Body, Controller, Get, HttpCode, InternalServerErrorException, Param, Post, Query} from '@nestjs/common';
 import {AppService} from './app.service';
 
 @Controller('pepito')  // Decorador   segmento url "/"
@@ -29,7 +29,55 @@ export class AppController {
     private obtenerSegundos():number{
       return new Date().getSeconds();
     }
+
+    @Get('bienvenida')
+    public bienvenida(
+        @Query() parametrosDeConsulta:ObjetoBienvenida,
+        @Query('nombre') nombre:string,
+        @Query('tel') telUsuario:number,
+        @Query('casado') casadoUsuario:boolean,
+    ): string{
+        console.log(parametrosDeConsulta)
+        console.log(typeof telUsuario)
+        // template strings `Mensaje ${variable}`
+        return `Mensaje ${parametrosDeConsulta.nombre} Numero: ${parametrosDeConsulta.tel}`
+    }
+
+    @Get('inscripcion-curso/:idCurso/:cedula') // /: nombreParametro
+    public inscripcionCurso(
+        @Param() parametrosDeRuta: ObjetoInscripcion,//
+        @Param('idCurso') idCurso: string,
+        @Param('cedula') cedula: string,
+    ): string{
+        console.log(parametrosDeRuta);
+        return `Te inscribiste al curso: ${idCurso} Con la cedula ${cedula}`
+    }
+
+    @Post('almorzar')
+    @HttpCode(200)
+    public almorzar(
+        @Body() parametrosDeCuerpo,
+        @Body('id') id: number, //no puede hacer esto si recibes un array
+
+    ): string{
+        console.log(parametrosDeCuerpo)
+        return `Te inscribiste al curso: ${parametrosDeCuerpo}`
+    }
+
 }
+
+interface ObjetoBienvenida {
+    nombre?:string;
+    tel?:string;
+    casado?:string;
+
+}
+
+interface ObjetoInscripcion {
+    idCurso:string;
+    cedula:string;
+}
+
 /*
 // typescript
 // var nombre : string = "Fabricio" ; (este no utilizamos nunca!!!)
