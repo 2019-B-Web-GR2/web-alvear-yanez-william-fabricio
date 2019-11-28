@@ -1,4 +1,14 @@
-import {Body, Controller, Get, HttpCode, InternalServerErrorException, Param, Post, Query} from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    Headers,
+    HttpCode,
+    InternalServerErrorException,
+    Param,
+    Post,
+    Query
+} from '@nestjs/common';
 import {AppService} from './app.service';
 
 @Controller('pepito')  // Decorador   segmento url "/"
@@ -62,6 +72,15 @@ export class AppController {
     ): string{
         console.log(parametrosDeCuerpo)
         return `Te inscribiste al curso: ${parametrosDeCuerpo}`
+    }
+
+    @Get('obtener-cabeceras')
+    obtenerCabeceras(
+        @Headers() cabeceras,
+        @Headers('numerouno') numeroUno: string,
+    ){
+        console.log(cabeceras)
+        return `Las cabeceras son: ${cabeceras}`
     }
 
 }
