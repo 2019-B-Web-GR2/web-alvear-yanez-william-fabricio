@@ -1,10 +1,11 @@
-import {BadRequestException, Body, Controller, Delete, Get, Param, Post, Put, Query} from "@nestjs/common";
+import {BadRequestException, Body, Controller, Delete, Get, Param, Post, Put, Query, Session} from "@nestjs/common";
 import {UsuarioService} from "./usuario.service";
 import {UsuarioEntity} from "./usuario.entity";
 import {DeleteResult} from "typeorm";
 import * as Joi from '@hapi/joi'
 import {UsuarioCreateDto} from "./usuario.create-dto";
 import {validate} from "class-validator";
+import {UsuarioUpdateDto} from "./usuario.update-dto";
 
 @Controller('usuario')
 export class UsuarioController {
@@ -13,6 +14,56 @@ export class UsuarioController {
         private readonly _usuarioService: UsuarioService,
     ){
 
+    }
+
+    @Post('login')
+    login(
+        @Body('username') username: string,
+        @Body('password') password: string,
+        @Session() session
+
+    ){
+        console.log('Session', session);
+        if(username === 'adrian' && password === '1234'){
+            session.usuario = {
+                nombre: 'Adrian',
+                userId: 1,
+                roles: ['Administrador']
+            }
+            return 'ok';
+        }
+
+        if(username === 'vicente' && password === '1234'){
+            session.usuario = {
+                nombre: 'Vicente',
+                userId: 2,
+                roles: ['Supervisor']
+            }
+            return 'ok';
+        }
+
+        
+
+        throw new BadRequestException('No envia credenciales')
+
+    }
+
+    @Get('sesion')
+    sesion(
+        @Session() session
+    ){
+        return session;
+    }
+
+    @Get('hola')
+    hola(): string{
+        return `
+<html>
+    <head><title>EPN</title></head>
+    <body>
+    <h1>Mi primera pagina web</h1>
+</body>
+</html>`
     }
 
     // GET /modelo/:id
@@ -41,11 +92,24 @@ export class UsuarioController {
     }
 
     @Put('id')
-    actualizarUnUsuario(
+    async actualizarUnUsuario(
         @Body() usuario : UsuarioEntity,
         @Param('id') id : string,
     ): Promise<UsuarioEntity>{
-        return this._usuarioService.actualizarUsuario(+id,usuario)
+        const usuarioUpdateDTO = new UsuarioUpdateDto();
+        usuarioUpdateDTO.nombre = usuario.nombre;
+        usuarioUpdateDTO.cedula = usuario.cedula;
+        usuarioUpdateDTO.id = +id;
+        const errores = await validate(usuarioUpdateDTO);
+        if (errores.length > 0) {
+            throw new BadRequestException('Error validando');
+        } else {
+            return this._usuarioService
+                .actualizarUsuario(
+                    +id,
+                    usuario
+                );
+        }
     }
 
     @Delete('id')
@@ -106,9 +170,6 @@ export class UsuarioController {
         )
     }
 
-    @Get('hola')
-    hola(): string{
-        return 'HOLA';
-    }
+
 
 }
