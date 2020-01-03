@@ -13,7 +13,7 @@ import {UsuarioModule} from "./usuario/usuario.module";
           {
             type: 'mysql',
             host: '172.31.108.148',
-            port: 32771,
+            port: 32769,
             username: 'LazaMH',
             password: '1234',
             database: 'Prueba',
