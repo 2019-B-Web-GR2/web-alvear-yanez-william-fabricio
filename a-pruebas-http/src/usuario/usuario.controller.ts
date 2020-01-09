@@ -1,4 +1,16 @@
-import {BadRequestException, Body, Controller, Delete, Get, Param, Post, Put, Query, Session} from "@nestjs/common";
+import {
+    BadRequestException,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Param,
+    Post,
+    Put,
+    Query,
+    Req, Res,
+    Session
+} from "@nestjs/common";
 import {UsuarioService} from "./usuario.service";
 import {UsuarioEntity} from "./usuario.entity";
 import {DeleteResult} from "typeorm";
@@ -15,6 +27,20 @@ export class UsuarioController {
     ){
 
     }
+
+    @Get('ejemploejs')
+    ejemploejs(
+        @Res() res,
+    ){
+        res.render('ejemplo',{
+            datos: {
+                nombre : 'Fabricio',
+
+            },
+        });
+
+    }
+
 
     @Post('login')
     login(
@@ -55,13 +81,45 @@ export class UsuarioController {
         return session;
     }
 
+    @Get('logout')
+    logout(
+        @Session() session,
+        @Req() req,
+    ){
+        session.usuario = undefined;
+        req.session.destroy();
+        return 'Deslogueado';
+    }
+
     @Get('hola')
-    hola(): string{
+    hola(
+        @Session() session,
+    ): string{
+        let contenidoHTML = '';
+        if(session.usuario){
+            contenidoHTML = '<ul>';
+            session.usuario
+                .roles
+                .forEach(
+                    (nombreRol) => {
+                        contenidoHTML = contenidoHTML + `<li>${nombreRol}</li>`;
+                    },
+                );
+            contenidoHTML += '</ul>';
+        }
+
+
         return `
 <html>
     <head><title>EPN</title></head>
     <body>
-    <h1>Mi primera pagina web</h1>
+    
+    <--! Condicion ? si : no -->
+    
+    <h1>Mi primera pagina web ${
+            session.usuario ? session.usuario.nombre : ''
+        }</h1>
+    ${contenidoHTML}
 </body>
 </html>`
     }
@@ -82,7 +140,7 @@ export class UsuarioController {
         @Body() usuario : UsuarioEntity,
     ){
         if(username === 'vicente' && password === '1234') {
-            if (session.usuario.roles === ['Administrador']) {
+            if (session.usuario.roles[0] === 'Administrador') {
                 let usuarioCreateDTO = new UsuarioCreateDto();
                 usuarioCreateDTO.nombre = usuario.nombre;
                 usuarioCreateDTO.cedula = usuario.cedula;
