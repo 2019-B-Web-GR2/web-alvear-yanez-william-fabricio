@@ -42,7 +42,7 @@ export class UsuarioController {
             return 'ok';
         }
 
-        
+
 
         throw new BadRequestException('No envia credenciales')
 
@@ -76,17 +76,25 @@ export class UsuarioController {
 
     @Post()
     async crearUnUsuario(
+        @Body('username') username: string,
+        @Body('password') password: string,
+        @Session() session,
         @Body() usuario : UsuarioEntity,
     ){
-        let usuarioCreateDTO = new UsuarioCreateDto();
-        usuarioCreateDTO.nombre = usuario.nombre;
-        usuarioCreateDTO.cedula = usuario.cedula;
-        const errores = await validate(usuarioCreateDTO)
-        if(errores.length > 0){
-            throw new BadRequestException('Error validando')
-        }else {
-            return this._usuarioService.agregarUsuario(usuario)
+        if(username === 'vicente' && password === '1234') {
+            if (session.usuario.roles === ['Administrador']) {
+                let usuarioCreateDTO = new UsuarioCreateDto();
+                usuarioCreateDTO.nombre = usuario.nombre;
+                usuarioCreateDTO.cedula = usuario.cedula;
+                const errores = await validate(usuarioCreateDTO)
+                if(errores.length > 0){
+                    throw new BadRequestException('Error validando')
+                }else {
+                    return this._usuarioService.agregarUsuario(usuario)
+                }
+            }
         }
+
 
 
     }
@@ -95,28 +103,44 @@ export class UsuarioController {
     async actualizarUnUsuario(
         @Body() usuario : UsuarioEntity,
         @Param('id') id : string,
+        @Body('username') username: string,
+        @Body('password') password: string,
+        @Session() session
+
     ): Promise<UsuarioEntity>{
-        const usuarioUpdateDTO = new UsuarioUpdateDto();
-        usuarioUpdateDTO.nombre = usuario.nombre;
-        usuarioUpdateDTO.cedula = usuario.cedula;
-        usuarioUpdateDTO.id = +id;
-        const errores = await validate(usuarioUpdateDTO);
-        if (errores.length > 0) {
-            throw new BadRequestException('Error validando');
-        } else {
-            return this._usuarioService
-                .actualizarUsuario(
-                    +id,
-                    usuario
-                );
+        if(username === 'vicente' && password === '1234'){
+            if(session.usuario.roles === ['Supervisor']){
+                const usuarioUpdateDTO = new UsuarioUpdateDto();
+                usuarioUpdateDTO.nombre = usuario.nombre;
+                usuarioUpdateDTO.cedula = usuario.cedula;
+                usuarioUpdateDTO.id = +id;
+                const errores = await validate(usuarioUpdateDTO);
+                if (errores.length > 0) {
+                    throw new BadRequestException('Error validando');
+                } else {
+                    return this._usuarioService
+                        .actualizarUsuario(
+                            +id,
+                            usuario
+                        );
+                }
+            }
         }
     }
 
     @Delete('id')
     eliminarUnUsuario(
+        @Body('username') username: string,
+        @Body('password') password: string,
+        @Session() session,
         @Param('id') id : string,
     ): Promise<DeleteResult>{
-        return this._usuarioService.BorrarUsuario(+id)
+        if(username === 'vicente' && password === '1234') {
+            if (session.usuario.roles === ['Administrador']) {
+                return this._usuarioService.BorrarUsuario(+id)
+            }
+        }
+
     }
 
     @Get()
