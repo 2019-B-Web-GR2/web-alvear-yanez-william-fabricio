@@ -1,1 +1,43 @@
-<h1>Holaa<%= datos.nombre%>></h1>
+<% const version = "1.0.0" ; %>
+<% const total = 1 + 2 ; %>
+<% const adrian = {
+   nombre : 'Adrian',
+   esProfesor : true
+}; %>
+
+<% const arregloNumeros = [1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10]; %>
+<% const urlBase = "https://i.blogs.es/b54943/god1/2560_3000" %>
+<% function anadirAnio(numero){
+    return '2020-' + numero
+}%>
+
+<h1>JOI :<%= datos.joi %></h1>
+
+<!-- Inicio Iterar -->
+<% arregloNumeros.forEach((numero)=>{ %>
+   <%- include('componentes/numeros/mostrar-numeros',
+   {
+       anadirAnio: anadirAnio,
+       numero:numero,
+       urlBase:urlBase
+   }); %>
+<% })%>
+<!-- FIN Iterar -->
+
+<% if(adrian.esProfesor){%>
+    <h1>Bienvenido profe <%= adrian.nombre %></h1>
+    <p>Suma: <%= datos.suma(1,3)%></p>
+<%}else {%>
+    <h1>Bienvenido estudiante</h1>
+    <p>Suma: <%= datos.suma(1,3)%></p>
+<%}%>
+
+
+<h1>
+    Holaaa <%= datos.nombre %>
+</h1>
+
+<p>Version : <%= version %></p>
+<p>Total : <%= total %></p>
+<p>Arreglo : <%= arregloNumeros %></p>
+<p>Objeto: <%= adrian.nombre %></p>

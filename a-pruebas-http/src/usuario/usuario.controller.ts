@@ -35,10 +35,16 @@ export class UsuarioController {
         res.render('ejemplo',{
             datos: {
                 nombre : 'Fabricio',
+                suma: this.suma, //Definicion de la funcion mas no la ejecucion
+                joi:Joi,
 
             },
         });
 
+    }
+
+    suma(numUno, numDos){
+        return numUno + numDos
     }
 
 
