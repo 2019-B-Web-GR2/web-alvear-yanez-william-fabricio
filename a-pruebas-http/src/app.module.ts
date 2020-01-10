@@ -17,7 +17,7 @@ import {UsuarioModule} from "./usuario/usuario.module";
             username: 'LazaMH',
             password: '1234',
             database: 'Prueba',
-            dropSchema : true,
+            dropSchema : false,
             entities: [
                 UsuarioEntity
             ],
