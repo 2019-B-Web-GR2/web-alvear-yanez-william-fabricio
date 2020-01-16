@@ -44,6 +44,16 @@ export class UsuarioController {
             );
     }
 
+    @Get('rutas/crear-usuario')
+    async rutaCrearUsuarios(
+        @Res() res,
+    ){
+        res.render(
+            'usuario/rutas/crear-usuario',
+
+        )
+    }
+
     @Get('ejemploejs')
     ejemploejs(
         @Res() res,
@@ -161,21 +171,15 @@ export class UsuarioController {
         @Session() session,
         @Body() usuario : UsuarioEntity,
     ){
-        if(username === 'vicente' && password === '1234') {
-            if (session.usuario.roles[0] === 'Administrador') {
-                let usuarioCreateDTO = new UsuarioCreateDto();
-                usuarioCreateDTO.nombre = usuario.nombre;
-                usuarioCreateDTO.cedula = usuario.cedula;
-                const errores = await validate(usuarioCreateDTO)
-                if(errores.length > 0){
-                    throw new BadRequestException('Error validando')
-                }else {
-                    return this._usuarioService.agregarUsuario(usuario)
-                }
-            }
+        let usuarioCreateDTO = new UsuarioCreateDto();
+        usuarioCreateDTO.nombre = usuario.nombre;
+        usuarioCreateDTO.cedula = usuario.cedula;
+        const errores = await validate(usuarioCreateDTO)
+        if(errores.length > 0){
+            throw new BadRequestException('Error validando')
+        }else {
+            return this._usuarioService.agregarUsuario(usuario)
         }
-
-
 
     }
 
