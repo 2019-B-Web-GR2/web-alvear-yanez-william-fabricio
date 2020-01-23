@@ -13,7 +13,7 @@ import {
 } from "@nestjs/common";
 import {UsuarioService} from "./usuario.service";
 import {UsuarioEntity} from "./usuario.entity";
-import {DeleteResult} from "typeorm";
+import {DeleteResult, Like} from "typeorm";
 import * as Joi from '@hapi/joi'
 import {UsuarioCreateDto} from "./usuario.create-dto";
 import {validate} from "class-validator";
@@ -30,15 +30,32 @@ export class UsuarioController {
 
     @Get('rutas/buscar-mostrar-usuario')
     async rutaMostrarUsuarios(
+        @Query('mensaje') mensaje: string,
+        @Query('error') error: string,
+        @Query('consultaUsuario') consultaUsuario: string,
         @Res() res,
     ){
+        let consultaServicio;
+        if(consultaServicio){
+            consultaServicio = [
+                {
+                    nombre: Like('%' + consultaUsuario + '%'),
+                },
+                {
+                    cedula: Like('%' + consultaUsuario + '%'),
+                },
+            ];
+        }
+
         const  usuarios = await this._usuarioService.buscarTodos();
         res.render(
             'usuario/rutas/buscar-mostrar-usuario',
             {
                 datos: {
                     //usuarios: usuarios,
+                    mensaje,
                     usuarios,
+                    error,
                 }
             }
             );
@@ -46,12 +63,66 @@ export class UsuarioController {
 
     @Get('rutas/crear-usuario')
     async rutaCrearUsuarios(
+        @Query('error') error: string,
         @Res() res,
     ){
         res.render(
             'usuario/rutas/crear-usuario',
+            {
+                datos: {
+                    error,
+                },
+            }
+        );
+    }
 
-        )
+    @Post(':id')
+    async eliminarUnoPost(
+        @Param('id') id: string,
+        @Res() res,
+    ): Promise<void> {
+        try {
+            await this._usuarioService
+                .BorrarUsuario(
+                    +id,
+                );
+            res.redirect(`/usuario/rutas/buscar-mostrar-usuarios?mensaje=Usuario ID: ${id} eliminado`);
+        } catch (error) {
+            console.error(error);
+            res.redirect('/usuario/rutas/buscar-mostrar-usuarios?error=Error del servidor');
+        }
+    }
+
+    @Get('ruta/editar-usuario/:idUsuario')
+    async rutaEditarUsuario(
+        @Query('error') error: string,
+        @Param('idUsuario') idUsuario: string,
+        @Res() res,
+    ) {
+        const consulta = {
+            id: idUsuario,
+        };
+        try {
+            const arregloUsuarios = await this._usuarioService.buscarTodos(consulta);
+            if (arregloUsuarios.length > 0) {
+                res.render(
+                    'usuario/rutas/crear-usuario',
+                    {
+                        datos: {error, usuario: arregloUsuarios[0]},
+                    },
+                );
+            } else {
+                res.redirect(
+                    '/usuario/rutas/buscar-mostrar-usuarios?error=No existe ese usuario',
+                );
+            }
+        } catch (error) {
+            console.log(error);
+            res.redirect(
+                '/usuario/rutas/buscar-mostrar-usuarios?error=Error editando usuario',
+            );
+        }
+
     }
 
     @Get('ejemploejs')
@@ -166,50 +237,64 @@ export class UsuarioController {
 
     @Post()
     async crearUnUsuario(
-        @Body('username') username: string,
-        @Body('password') password: string,
-        @Session() session,
         @Body() usuario : UsuarioEntity,
-    ){
-        let usuarioCreateDTO = new UsuarioCreateDto();
+        @Res() res,
+    ): Promise<void>{
+        const usuarioCreateDTO = new UsuarioCreateDto();
         usuarioCreateDTO.nombre = usuario.nombre;
         usuarioCreateDTO.cedula = usuario.cedula;
         const errores = await validate(usuarioCreateDTO)
         if(errores.length > 0){
-            throw new BadRequestException('Error validando')
+            // throw new BadRequestException('Error validando')
+            res.redirect(
+                '/usuario/rutas/crear-usuario?error=Error validando',
+            );
         }else {
-            return this._usuarioService.agregarUsuario(usuario)
+            try {
+                await this._usuarioService
+                    .agregarUsuario(
+                        usuario,
+                    );
+                res.redirect(
+                    '/usuario/rutas/buscar-mostrar-usuarios',
+                );
+            } catch (error) {
+                console.error(error);
+                res.redirect(
+                    '/usuario/rutas/crear-usuario?error=Error del servidor',
+                );
+            }
         }
 
     }
 
-    @Put('id')
+    @Post('id')
     async actualizarUnUsuario(
         @Body() usuario : UsuarioEntity,
         @Param('id') id : string,
-        @Body('username') username: string,
-        @Body('password') password: string,
-        @Session() session
+        @Res() res,
 
-    ): Promise<UsuarioEntity>{
-        if(username === 'vicente' && password === '1234'){
-            if(session.usuario.roles === ['Supervisor']){
-                const usuarioUpdateDTO = new UsuarioUpdateDto();
-                usuarioUpdateDTO.nombre = usuario.nombre;
-                usuarioUpdateDTO.cedula = usuario.cedula;
-                usuarioUpdateDTO.id = +id;
-                const errores = await validate(usuarioUpdateDTO);
-                if (errores.length > 0) {
-                    throw new BadRequestException('Error validando');
-                } else {
-                    return this._usuarioService
-                        .actualizarUsuario(
-                            +id,
-                            usuario
-                        );
-                }
-            }
+    ): Promise<void>{
+        const usuarioUpdateDTO = new UsuarioUpdateDto();
+        usuarioUpdateDTO.nombre = usuario.nombre;
+        usuarioUpdateDTO.cedula = usuario.cedula;
+        usuarioUpdateDTO.id = +id;
+        const errores = await validate(usuarioUpdateDTO);
+        if (errores.length > 0) {
+            res.redirect(
+                '/usuario/rutas/editar-usuario/' + id + '?error=Usuario no valido',
+            );
+        }else{
+            await this._usuarioService
+                .actualizarUsuario(
+                    +id,
+                    usuario,
+                );
+            res.redirect(
+                '/usuario/rutas/buscar-mostrar-usuarios?mensaje=El usuario ' + usuario.nombre + ' actualizado',
+            );
         }
+
     }
 
     @Delete('id')

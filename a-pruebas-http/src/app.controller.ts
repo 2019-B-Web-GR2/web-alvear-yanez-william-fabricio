@@ -7,7 +7,8 @@ import {
     InternalServerErrorException,
     Param,
     Post,
-    Query
+    Query,
+    Res,
 } from '@nestjs/common';
 import {AppService} from './app.service';
 
@@ -15,6 +16,13 @@ import {AppService} from './app.service';
 export class AppController {
     constructor(private readonly appService: AppService) {
     } //http://localhost:4000/pepito/hola-mundo
+
+    @Get('login')
+    login(
+        @Res() res,
+    ) {
+        res.render('login/login');
+    }
 
     @Get() // url
     getHello(): string {

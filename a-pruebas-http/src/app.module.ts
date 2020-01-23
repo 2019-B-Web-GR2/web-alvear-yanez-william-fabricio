@@ -5,10 +5,13 @@ import {TypeOrmModule} from "@nestjs/typeorm";
 import {UsuarioEntity} from "./usuario/usuario.entity";
 import {UsuarioService} from "./usuario/usuario.service";
 import {UsuarioModule} from "./usuario/usuario.module";
+import {MascotasModule} from "./mascotas/mascotas.module";
+import {MascotasEntity} from "./mascotas/mascotas.entity";
 
 @Module({
   imports: [
       UsuarioModule,
+      MascotasModule,
       TypeOrmModule.forRoot(
           {
             type: 'mysql',
@@ -17,9 +20,10 @@ import {UsuarioModule} from "./usuario/usuario.module";
             username: 'LazaMH',
             password: '1234',
             database: 'Prueba',
-            dropSchema : false,
+            dropSchema : true,
             entities: [
-                UsuarioEntity
+                UsuarioEntity,
+                MascotasEntity,
             ],
             synchronize: true, //si es false solo se va a conectar, si es true se crea
           }

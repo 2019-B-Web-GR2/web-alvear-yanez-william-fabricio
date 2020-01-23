@@ -1,6 +1,40 @@
 <%- include('../../compartido/cabeceras')%>
 
 <div class="container">
+
+    <form action="/usuario/ruta/mostrar-usuarios"
+          method="GET"
+    >
+        <div class="form-group">
+            <label for="consultaID">Buscar usuario:</label>
+            <input id="consultaID"
+                   type="text"
+                   name="consultaUsuario"
+                   placeholder="Ej: 1718138939 o Adrian"
+                   title="Ingresar la busqueda por cedula o nombre"
+                   class="form-control">
+            <small id="cedulaIDHelp"
+                   class="form-text text-muted">
+                Puede buscar por cedula o nombre.
+            </small>
+        </div>
+    </form>
+
+
+
+
+<% if(datos.mensaje){ %>
+        <div class="alert alert-primary" role="alert">
+            <%= datos.mensaje %>
+        </div>
+    <% } %>
+
+    <% if(datos.error){ %>
+        <div class="alert alert-danger" role="alert">
+            <%= datos.error %>
+        </div>
+    <% } %>
+
     <h1>Ruta mostrar usuario</h1>
 
     <a href="/usuario/rutas/crear-usuario">

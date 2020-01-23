@@ -1,8 +1,18 @@
-<%- include('../../compartido/cabeceras')%>
-<div class="container">
-    <h1>Crear Usuario</h1>
+<%- include('../../compartido/cabeceras') %>
 
-    <form action="/usuario"
+<% const estaEditando = datos.usuario != undefined; %>
+
+<div class="container">
+
+    <% if(datos.error){ %>
+        <div class="alert alert-danger" role="alert">
+            <%= datos.error %>
+        </div>
+    <% } %>
+
+    <h1><%= estaEditando ? 'Editando ' + datos.usuario.nombre : 'Crear Usuario' %> </h1>
+
+    <form action="/usuario<%= estaEditando ? '/' + datos.usuario.id : ''%>"
           method="POST"
     >
         <div class="form-group">
@@ -10,6 +20,7 @@
             <input id="nombreID"
                    type="text"
                    name="nombre"
+                   value="<%= estaEditando ?  '/' + datos.usuario.nombre : '' %>"
                    placeholder="Ej: Fabricio Alvear"
                    title="Ingresar nombre de usuario"
                    class="form-control">
@@ -24,6 +35,8 @@
             <input id="cedulaID"
                    type="text"
                    name="cedula"
+                   value="<%= estaEditando ?  + datos.usuario.cedula : '' %>"
+                   <%= estaEditando ? 'disabled' : '' %>
                    placeholder="Ej: 15146848"
                    title="Ingresar cedula del usuario"
                    class="form-control">
@@ -47,4 +60,4 @@
 
 
 </div>
-<%- include('../../compartido/pie-de-pagina')%>
+<%- include('../../compartido/pie-de-pagina') %>
