@@ -2,6 +2,148 @@
 
 <div class="container">
 
+    <select name="provincias"
+            id="provincias"
+            onchange="cargarCiudades()"
+    >
+        <option value="1">Pichincha</option>
+        <option value="2">Guayas</option>
+
+    </select>
+
+    <div id="contenedorCiudades"></div>
+
+    <script>
+        function cargarCiudades() {
+            console.log('CAMBIE :D');
+            const ciudadPichincha = [
+                {id: 1, nombre: 'Quito'}
+            ]
+            const ciudadGuayas = [
+                {id: 2, nombre: 'Guayaquil'}
+            ]
+            const etiquetaProvincias = document.getElementById('provincias');
+            const etiquetaContenedoraCiudades = document.getElementById('contenedorCiudades');
+            let opciones = ''
+            if(etiquetaProvincias.value === '1'){
+                console.log('Pichincha');
+                ciudadPichincha
+                    .forEach(
+                        (ciudad) => {
+                            opciones = opciones +
+                                `<option value="${ciudad.id}">${ciudad.nombre}</option>`;
+                        }
+                    );
+            }else{
+                console.log('Guayas');
+                ciudadGuayas
+                    .forEach(
+                        (ciudad) => {
+                            opciones = opciones +
+                                `<option value="${ciudad.id}">${ciudad.nombre}</option>`;
+                        }
+                    );
+            }
+            const select = `
+            <select name="ciudad" id="ciudad">
+                ${opciones}
+            </select>
+            `;
+            const etiquetaSelect = document.createElement('div');
+            etiquetaSelect.innerHTML = select;
+            const existeNodo = etiquetaContenedoraCiudades.childNodes[0];
+            if(existeNodo){
+                etiquetaContenedoraCiudades.removeChild(existeNodo);
+            }
+            etiquetaContenedoraCiudades.appendChild(etiquetaSelect);
+        }
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <button onclick="anadirParrafo()">
+        hola mundo
+    </button>
+
+    <div id="contenedor">
+
+    </div>
+
+    <script>
+
+        function anadirParrafo() {
+            const elementoContenedor = document.getElementById('contenedor');
+            const linkImagen = 'https://media.playstation.com/is/image/SCEA/god-of-war-screen-05-ps4-us-12jun17?$native_nt$';
+            const nombreEtiqueta = 'div';
+            const div = document.createElement(nombreEtiqueta);
+            div.innerHTML = `
+            <div>
+                <img src="${linkImagen}" width="200" height="200" alt="">
+                <p>Hola<p>
+                <button class ="btn btn-info"
+                                onclick="anadirParrafo()">
+                    Dale click
+                </button>
+            </div>
+            ` ;
+            elementoContenedor.appendChild(div)
+        }
+
+        function holaMundo(EVENTO) { // envia evento
+            console.log(EVENTO)
+            console.log('Hola mundo :c');
+        }
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <form action="/usuario/ruta/mostrar-usuarios"
           method="GET"
     >
